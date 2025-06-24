@@ -1,0 +1,26 @@
+FROM python:3.10-slim AS builder
+
+WORKDIR /app
+
+RUN pip install --upgrade pip && pip install uv
+
+COPY requirements.txt .
+
+RUN pip install --upgrade pip && pip install -r requirements.txt
+
+COPY . .
+
+
+#########################################
+#########################################
+FROM python:3.10-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir uv
+
+COPY --from=builder /app /app
+
+EXPOSE 8002
+
+CMD ["uv", "run", "app.py"]
